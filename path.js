@@ -10,7 +10,7 @@ scene.background = new THREE.Color('grey');
 
 const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 1000000);
 camera.position.z = 0;
-camera.position.y = 1500;
+camera.position.y = 3500;
 new OrbitControls(camera, canvas)
 // const axesHelper = new THREE.AxesHelper(50);
 // scene.add(axesHelper);
@@ -55,25 +55,47 @@ let gridX = 0
 let gridZ = 0
 let grid = ''
 let count = 0
+let mainDir;
+let dirs = ['n', 'e', 's', 'w']
 
-const builder = setInterval(() => {
+const builder = () => {
 
-    let dirs = ['n', 'e', 's', 'w']
-    let dir = dirs[Math.floor(Math.random() * 4)]
-
-    if (dir == backDir) {
-        dir = dirs[Math.floor(Math.random() * 4)]
+    if (!mainDir) {
+        mainDir = dirs[Math.floor(Math.random() * 4)]
+        switch (mainDir) {
+            case 'n':
+                dirs = ['n', 'e', 'w']
+                break;
+            case 'w':
+                dirs = ['n', 's', 'w']
+                break;
+            case 'e':
+                dirs = ['n', 'e', 's']
+                break;
+            case 's':
+                dirs = ['e', 's', 'w']
+                break;
+        }
     }
 
-    if (grid.includes(`(${gridX}, ${gridZ + 1})`) && grid.includes(`(${gridX + 1}, ${gridZ})`) && grid.includes(`(${gridX}, ${gridZ - 1})`) && grid.includes(`(${gridX - 1}, ${gridZ})`)) {
-        console.log('killed')
-        kill()
+    let dir = dirs[Math.floor(Math.random() * 3)]
+
+    if (dir == backDir) {
+        dir = dirs[Math.floor(Math.random() * 3)]
+    }
+
+    while (grid.includes(`(${gridX}, ${gridZ + 1})`) && grid.includes(`(${gridX + 1}, ${gridZ})`) && grid.includes(`(${gridX}, ${gridZ - 1})`) && grid.includes(`(${gridX - 1}, ${gridZ})`)) {
+        lastZ+= 50
+        lastX+= 50
+        gridX+= 10
+        gridZ+= 10
+        console.log('change')
     }
 
     switch (dir) {
         case 'n':
             if (grid.includes(`(${gridX}, ${gridZ + 1})`)) {
-                return
+                return builder()
             }
             lastZ += 50;
             backDir = 's'
@@ -82,7 +104,7 @@ const builder = setInterval(() => {
             break;
         case 'e':
             if (grid.includes(`(${gridX + 1}, ${gridZ})`)) {
-                return
+                return builder()
             }
             lastX += 50;
             backDir = 'w'
@@ -91,7 +113,7 @@ const builder = setInterval(() => {
             break;
         case 's':
             if (grid.includes(`(${gridX}, ${gridZ - 1})`)) {
-                return
+                return builder()
             }
             lastZ -= 50;
             backDir = 'n'
@@ -100,7 +122,7 @@ const builder = setInterval(() => {
             break;
         case 'w':
             if (grid.includes(`(${gridX - 1}, ${gridZ})`)) {
-                return
+                return builder()
             }
             lastX -= 50;
             backDir = 'e'
@@ -109,22 +131,24 @@ const builder = setInterval(() => {
             break;
     }
 
-    console.log(grid)
+    // console.log(grid)
 
     count++
     test()
 
     createPlane(lastX, lastZ)
-}, 50);
+}
+
+const interval = setInterval(builder, 1);
 
 function test() {
     if (count > 100) {
-        clearInterval(builder)
+        clearInterval(interval)
     }
 }
 
 function kill() {
-    clearInterval(builder)
+    clearInterval(interval)
 }
 
 //---------------------------------------------------------------------------
