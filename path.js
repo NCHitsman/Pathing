@@ -18,7 +18,7 @@ new OrbitControls(camera, canvas)
 //---------------------------------------------------------------------------
 
 
-let target = [-50, 150]
+let target = [250, 10]
 
 const cubeGeo = new THREE.BoxGeometry(2000, 2000, 2000);
 const cubeMat = new THREE.MeshBasicMaterial({ wireframe: true })
